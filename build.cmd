@@ -1,0 +1,1 @@
+java -agentlib:native-image-agent=config-output-dir=src/main/resources -jar target/xktz-examiner-1.0-SNAPSHOT-with-dependencies.jar

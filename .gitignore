@@ -1,0 +1,12 @@
+# Project exclude paths
+/.idea/
+
+/target/
+
+/log/
+
+/gen/
+
+/test/
+
+/project/
