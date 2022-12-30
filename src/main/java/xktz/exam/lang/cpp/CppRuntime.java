@@ -167,26 +167,25 @@ public class CppRuntime extends LanguageRuntime {
         commands.addAll(includes.stream().map(s -> {
             var p = Path.of(s);
             if (p.isAbsolute()) {
-                return "-I " + canonicalPath(s);
+                return "-I" + canonicalPath(s);
             } else {
-                return "-I " + canonicalPath(projectFile(s));
+                return "-I" + canonicalPath(projectFile(s));
             }
         }).toList());
         // add lib directories file
         commands.addAll(libDirectories.stream().map(s -> {
             var p = Path.of(s);
             if (p.isAbsolute()) {
-                return "-L " + canonicalPath(s);
+                return "-L" + canonicalPath(s);
             } else {
-                return "-L " + canonicalPath(projectFile(s));
+                return "-L" + canonicalPath(projectFile(s));
             }
         }).toList());
         // add libs
-        commands.addAll(libs.stream().map(s -> "-l " + s).toList());
+        commands.addAll(libs.stream().map(s -> "-l" + s).toList());
         // set output
         if (out != null) {
-            commands.add("-o");
-            commands.add(canonicalPath(out));
+            commands.add("-o" + canonicalPath(out));
         }
 
         outputCommand(String.join(" ", commands));
@@ -201,7 +200,18 @@ public class CppRuntime extends LanguageRuntime {
 
     @Override
     public Environment.SystemOutput run(byte[] input) {
+        outputCommand(
+                String.join(" ", List.of(canonicalPath(out + SystemType.executableExtension())))
+        );
         return environment.executeCommand(timeLimit, input, canonicalPath(out + SystemType.executableExtension()));
+    }
+
+    @Override
+    public void runInherited(byte[] input) {
+        outputCommand(
+                String.join(" ", List.of(canonicalPath(out + SystemType.executableExtension())))
+        );
+        environment.executeInheritIOCommand(canonicalPath(out + SystemType.executableExtension()));
     }
 
     /**

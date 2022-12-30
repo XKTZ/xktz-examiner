@@ -1,10 +1,8 @@
 package xktz.exam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import xktz.exam.examine.ExaminerProvider;
 import xktz.exam.lang.LanguageRuntimeProvider;
-import xktz.exam.lang.cpp.CppRuntime;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Command line
@@ -27,6 +23,11 @@ import java.util.function.Function;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            // test the native image
+            System.out.printf(Configuration.getConfiguration(Main.class.getResourceAsStream("/config.json")).toString());
+            return;
+        }
         var command = args[0];
         final var properties = new Properties();
 
@@ -68,14 +69,10 @@ public class Main {
 
         switch (command) {
             case "run" -> {
-                if (!properties.containsKey("input")) {
-                    System.out.println("Require input file specified as \"input\"");
-                    return;
-                }
-                var data = Files.readAllBytes(Path.of(properties.getProperty("input")));
+                var data = (properties.containsKey("input") && Files.exists(Path.of(properties.getProperty("input")))) ?
+                        Files.readAllBytes(Path.of(properties.getProperty("input"))) : new byte[0];
                 exam.build(true, false, false);
                 exam.run(data);
-                System.out.println(new String(data));
             }
             case "build" -> {
                 exam.build(true, true, true);

@@ -93,22 +93,22 @@ public class Exam {
         this.workDirectory = workDirectory;
         new File(workDirectory).mkdirs();
 
-        this.epoch = config.epoch();
-        if (config.charset().equalsIgnoreCase(CHARSET_BYTE)) {
+        this.epoch = config.epoch;
+        if (config.charset.equalsIgnoreCase(CHARSET_BYTE)) {
             transformOutput = false;
             this.charset = null;
         } else {
             transformOutput = true;
-            this.charset = Charset.forName(config.charset());
+            this.charset = Charset.forName(config.charset);
         }
 
-        this.project = LanguageRuntimeProvider.getRuntime(workDirectory, config.project());
-        this.generator = LanguageRuntimeProvider.getRuntime(workDirectory, config.generator());
-        this.examiner = ExaminerProvider.getExaminer(workDirectory, config.examiner());
+        this.project = LanguageRuntimeProvider.getRuntime(workDirectory, config.project);
+        this.generator = LanguageRuntimeProvider.getRuntime(workDirectory, config.generator);
+        this.examiner = ExaminerProvider.getExaminer(workDirectory, config.examiner);
 
         this.logger = ExamLoggerProvider.getExamLogger(workDirectory, config.log);
-        this.logDir = Path.of(config.log().dir()).isAbsolute() ? config.log().dir()
-                : canonicalPath(workDirectory + File.separator + config.log().dir());
+        this.logDir = Path.of(config.log.dir).isAbsolute() ? config.log.dir
+                : canonicalPath(workDirectory + File.separator + config.log.dir);
         new File(logDir).mkdirs();
 
         this.config = config;
@@ -136,9 +136,8 @@ public class Exam {
         }
     }
 
-    public byte[] run(byte[] input) throws IOException {
-        var result = project.run(input);
-        return result.stdout();
+    public void run(byte[] input) {
+        project.runInherited(input);
     }
 
     /**
@@ -187,11 +186,11 @@ public class Exam {
             // logStdErrMessage the end
             logger.logResult(i, examinerOutput);
         } catch (Environment.TimeoutException e) {
-            logger.logError(epoch, e.getMessage());
+            logger.logError(i, e.getMessage());
         } catch (ProcessExecutionFailedException e) {
-            logger.logError(epoch, "Process <%s> failed".formatted(e.getMessage()));
+            logger.logError(i, "Process <%s> failed".formatted(e.getMessage()));
         } catch (Exception e) {
-            logger.logError(epoch, e.getMessage());
+            logger.logError(i, e.getMessage());
         }
         return true;
     }
@@ -256,29 +255,18 @@ public class Exam {
         }
     }
 
-    public static record ExaminerConfiguration(
-            int epoch,
-            ExamLogger.LogConfiguration log,
-            Map<String, Object> project,
-            Map<String, Object> generator,
-            Map<String, Object> examiner,
-            String charset
-    ) {
+    public static class ExaminerConfiguration {
+        public int epoch;
 
-        @JsonCreator
-        public ExaminerConfiguration(@JsonProperty int epoch,
-                                     @JsonProperty ExamLogger.LogConfiguration log,
-                                     @JsonProperty Map<String, Object> project,
-                                     @JsonProperty Map<String, Object> generator,
-                                     @JsonProperty Map<String, Object> examiner,
-                                     @JsonProperty String charset) {
-            this.epoch = epoch;
-            this.log = log == null ? new ExamLogger.LogConfiguration(null, null, null) : log;
-            this.project = project;
-            this.generator = generator;
-            this.examiner = examiner;
-            this.charset = charset;
-        }
+        public ExamLogger.LogConfiguration log = new ExamLogger.LogConfiguration();
+
+        public Map<String, Object> project;
+
+        public Map<String, Object> generator;
+
+        public Map<String, Object> examiner;
+
+        public String charset;
 
         @Override
         public String toString() {

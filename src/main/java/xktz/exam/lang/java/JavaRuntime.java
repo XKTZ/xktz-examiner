@@ -83,14 +83,14 @@ public class JavaRuntime extends LanguageRuntime {
         commands.add("javac");
         if (!this.classPath.isEmpty()) {
             commands.add("-cp");
-            commands.add(String.join(";", this.classPath));
+            commands.add(String.join(";", this.classPath.stream().map(LanguageRuntime::canonicalPath).toList()));
         }
         commands.add("-sourcepath");
-        commands.add(src);
+        commands.add(canonicalPath(src));
         commands.add(mainPath);
         commands.add("-d");
-        commands.add(out);
-        System.err.println(String.join(" ", commands));
+        commands.add(canonicalPath(out));
+        outputCommand(String.join(" ", commands));
         return environment.executeCommand(compileLimit,
                 commands.toArray(String[]::new));
     }
@@ -100,6 +100,11 @@ public class JavaRuntime extends LanguageRuntime {
         return environment.executeCommand(out,
                 timeLimit, input,
                 "java", main);
+    }
+
+    @Override
+    public void runInherited(byte[] input) {
+        environment.executeInheritIOCommand("java", main);
     }
 
     @Override

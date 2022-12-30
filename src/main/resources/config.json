@@ -1,0 +1,26 @@
+{
+  "charset" : "byte",
+  "examiner" : {
+    "type": "compare",
+    "mode": "token",
+    "runner" : {
+      "files" : [],
+      "out" : "examiner",
+      "lang" : "cpp",
+      "compiler" : "g++"
+    }
+  },
+  "project" : {
+    "files" : [],
+    "out" : "project",
+    "lang" : "cpp",
+    "compiler" : "g++"
+  },
+  "generator" : {
+    "files" : [],
+    "out" : "generator",
+    "lang" : "cpp",
+    "compiler" : "g++"
+  },
+  "epoch" : 10
+}

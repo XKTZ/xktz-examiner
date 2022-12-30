@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -18,6 +19,14 @@ public class Configuration {
     public static Exam.ExaminerConfiguration getConfiguration(String file) {
         try {
             return OBJECT_MAPPER.readValue(new File(file), Exam.ExaminerConfiguration.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Exam.ExaminerConfiguration getConfiguration(InputStream stream) {
+        try {
+            return OBJECT_MAPPER.readValue(stream, Exam.ExaminerConfiguration.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -12,34 +12,6 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
         Exam exam = new Exam("d://test", new Exam.ExaminerConfiguration(
-                1,
-                new ExamLogger.LogConfiguration("log", "print", Map.of(
-                        "to", List.of("stdout")
-                )),
-                Map.of(
-                        "lang", "c",
-                        "compiler", "gcc",
-                        "dir", "project",
-                        "files", List.of("main.c"),
-                        "out", "main"
-                ),
-                Map.of(
-                        "lang", "c++",
-                        "dir", "test",
-                        "files", List.of("main.cpp"),
-                        "out", "testgen"
-                ),
-                Map.of(
-                        "type", "compare",
-                        "mode", "token",
-                        "runner", Map.of(
-                                "lang", "c++",
-                                "dir", "exam",
-                                "files", List.of("main.cpp"),
-                                "out", "examine"
-                        )
-                ),
-                "byte"
         ));
         exam.build(true, true, true);
         exam.examine();

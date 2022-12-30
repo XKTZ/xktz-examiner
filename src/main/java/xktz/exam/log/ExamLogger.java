@@ -1,6 +1,7 @@
 package xktz.exam.log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import xktz.exam.Main;
 import xktz.exam.examine.Examiner;
 
 import java.util.List;
@@ -42,15 +43,13 @@ public interface ExamLogger extends AutoCloseable {
      */
     public void logResult(int epoch, Examiner.ExamineResult result);
 
-    public static record LogConfiguration(String dir,
-                                          String type,
-                                          Map<String, Object> config) {
-        public LogConfiguration(String dir,
-                                String type,
-                                Map<String, Object> config) {
-            this.dir = dir == null ? "./log": dir;
-            this.type = type == null ? "print" : type;
-            this.config = config == null ? Map.of() : config;
-        }
+    public static class LogConfiguration {
+
+        public String dir = "./log";
+
+        public String type = "print";
+
+        public Map<String, Object> config = Map.of();
+
     }
 }

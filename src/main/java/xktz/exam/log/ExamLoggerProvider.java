@@ -21,14 +21,14 @@ public class ExamLoggerProvider {
 
     static {
         logMap.put("print", (conf) -> new PrintStreamLogger(
-                ((List<String>) conf.config().getOrDefault("to", List.of("stdout"))).stream()
+                ((List<String>) conf.config.getOrDefault("to", List.of("stdout"))).stream()
                         .map(ExamLoggerProvider::getPrintStream)
                         .toList()
         ));
     }
 
     public static ExamLogger getExamLogger(String workDirectory, ExamLogger.LogConfiguration config) {
-        return logMap.get(config.type()).apply(config);
+        return logMap.get(config.type).apply(config);
     }
 
     private static ImmutablePair<PrintStream, Boolean> getPrintStream(String s) {

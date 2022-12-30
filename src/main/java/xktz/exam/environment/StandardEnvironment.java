@@ -1,18 +1,11 @@
 package xktz.exam.environment;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.SystemUtils;
 import xktz.exam.environment.system.SystemType;
 
-import javax.naming.TimeLimitExceededException;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
 
@@ -67,14 +60,12 @@ public class StandardEnvironment implements Environment {
     }
 
     @Override
-    public void executeInheritIOCommand(long timeout, String... commands) {
+    public void executeInheritIOCommand(String... commands) {
         try {
             var processBuilder = new ProcessBuilder(commands).inheritIO();
             var process = processBuilder.start();
-            if (!process.waitFor(timeout, TimeUnit.MILLISECONDS)) {
-                throw new TimeoutException(timeout);
-            }
-        } catch (IOException | InterruptedException e) {
+            process.waitFor();
+        } catch (InterruptedException | IOException e) {
             throw new EnvironmentExecutionException(e);
         }
     }

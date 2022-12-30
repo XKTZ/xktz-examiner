@@ -6,6 +6,7 @@ import xktz.exam.environment.Environment;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -76,10 +77,10 @@ public abstract class LanguageRuntime {
      * @param config           the configuration
      */
     public LanguageRuntime(String workDirectory, String projectDirectory, Environment environment, Map<String, Object> config) {
-        this.workDirectory = canonicalPath(workDirectory);
-        this.projectDirectory = Path.of(projectDirectory).isAbsolute() ? canonicalPath(projectDirectory)
-                : canonicalPath(workDirectory + File.separator + projectDirectory);
-        this.temporaryDirectory = canonicalPath(workDirectory + File.separator + TEMPORARY_DIRECTORY);
+        this.workDirectory = canonicalPath(workDirectory, false);
+        this.projectDirectory = Path.of(projectDirectory).isAbsolute() ? canonicalPath(projectDirectory, false)
+                : canonicalPath(workDirectory + File.separator + projectDirectory, false);
+        this.temporaryDirectory = canonicalPath(workDirectory + File.separator + TEMPORARY_DIRECTORY, false);
         this.environment = environment;
         this.config = config;
         this.commandOutput = Optional.ofNullable(property(KEY_COMMAND_OUTPUT, new PropertyType<List<String>>() {
@@ -110,7 +111,16 @@ public abstract class LanguageRuntime {
     public abstract Environment.SystemOutput run(byte[] input);
 
     /**
+     * Run the code providing input. Use inherited IO.
+     *
+     * @param input the input for the language, the thing written in stdin
+     * @return the result after running (stdout, stderr)
+     */
+    public abstract void runInherited(byte[] input);
+
+    /**
      * Get a project file
+     *
      * @param name name
      * @return project file
      */
@@ -124,7 +134,11 @@ public abstract class LanguageRuntime {
      * @return temporary directory
      */
     protected final String requestTemporary() {
-        new File(temporaryDirectory).mkdirs();
+        try {
+            Files.createDirectories(Path.of(temporaryDirectory));
+        } catch (IOException e) {
+            throw new CompilationException(e);
+        }
         return temporaryDirectory;
     }
 
@@ -219,12 +233,26 @@ public abstract class LanguageRuntime {
      * @param path file
      * @return canonical path
      */
-    protected static String canonicalPath(String path) {
+    protected static String canonicalPath(String path, boolean formatted) {
         try {
-            return new File(path).getCanonicalPath();
+            if (formatted) {
+                return "\"" + new File(path).getCanonicalPath() + "\"";
+            } else {
+                return new File(path).getCanonicalPath();
+            }
         } catch (IOException e) {
             throw new CompilationException(e.getMessage());
         }
+    }
+
+    /**
+     * Get a canonical path of a file
+     *
+     * @param path file
+     * @return canonical path
+     */
+    protected static String canonicalPath(String path) {
+        return canonicalPath(path, true);
     }
 
     /**
@@ -233,6 +261,7 @@ public abstract class LanguageRuntime {
     public static class CompilationException extends RuntimeException {
         /**
          * Create compilation exception by message
+         *
          * @param msg
          */
         public CompilationException(String msg) {
@@ -241,6 +270,7 @@ public abstract class LanguageRuntime {
 
         /**
          * Create compilation exception by parent exception
+         *
          * @param e
          */
         public CompilationException(Throwable e) {

@@ -3,6 +3,7 @@ package xktz.exam.environment;
 import xktz.exam.environment.system.SystemType;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -15,7 +16,7 @@ import java.util.Collection;
  */
 public interface Environment {
 
-    Charset SYSTEM_CHARSET = Charset.forName(System.getProperty("sun.jnu.encoding"));
+    Charset SYSTEM_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Exit code success
@@ -81,7 +82,7 @@ public interface Environment {
      *
      * @param commands command
      */
-    void executeInheritIOCommand(long timeout, String... commands);
+    void executeInheritIOCommand(String... commands);
 
     public record SystemOutput(int exitCode, byte[] stdout, byte[] stderr) {
     }
