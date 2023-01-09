@@ -69,6 +69,21 @@ public class PrintStreamLogger implements ExamLogger {
     }
 
     @Override
+    public void logStatistic(int total, int success, int failed, int error) {
+        var msg = """
+                Exam Result Total: \n
+                Total: %d \n
+                Success: %d \n
+                Failed: %d \n
+                Error: %d
+                """.formatted(total, success, failed, error);
+        for (var stream: streams) {
+            stream.getLeft().println(msg);
+            stream.getLeft().println();
+        }
+    }
+
+    @Override
     public void close() throws Exception {
         for (var stream : streams) {
             if (stream.getRight()) {

@@ -144,11 +144,15 @@ public class Exam {
      * Test the codes
      */
     public void examine() throws IOException {
+        var stat = new ExamStatus();
         for (int i = 1; i <= epoch; i++) {
-            if (!epoch(i)) {
+            if (!epoch(i, stat)) {
                 break;
             }
         }
+
+        logger.logStatistic(stat.total, stat.success, stat.failed, stat.error);
+
     }
 
     /**
@@ -156,7 +160,8 @@ public class Exam {
      *
      * @return continue or not
      */
-    private boolean epoch(int i) {
+    private boolean epoch(int i, ExamStatus status) {
+        status.total++;
         try {
             logger.logStart(i);
 
@@ -185,6 +190,12 @@ public class Exam {
 
             // logStdErrMessage the end
             logger.logResult(i, examinerOutput);
+
+            switch (examinerOutput.state()) {
+                case Examiner.SUCCESS -> status.success++;
+                case Examiner.FAILED -> status.failed++;
+                case Examiner.ERROR -> status.error++;
+            }
         } catch (Environment.TimeoutException e) {
             logger.logError(i, e.getMessage());
         } catch (ProcessExecutionFailedException e) {
@@ -279,5 +290,12 @@ public class Exam {
                     ", charset='" + charset + '\'' +
                     '}';
         }
+    }
+
+    private static class ExamStatus {
+        int success = 0;
+        int failed = 0;
+        int error = 0;
+        int total = 0;
     }
 }

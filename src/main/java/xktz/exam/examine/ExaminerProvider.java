@@ -88,6 +88,8 @@ public class ExaminerProvider {
      */
     public static Map<String, Object> initConfiguration(String lang) {
         return Map.of(
+                EXAMINER_TYPE_KEY, "compare",
+                "mode", ComparisonExaminer.ExaminerMode.STRICT,
                 "runner", LanguageRuntimeProvider.initConfiguration("examiner", lang)
         );
     }

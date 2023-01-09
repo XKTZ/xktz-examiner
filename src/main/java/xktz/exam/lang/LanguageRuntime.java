@@ -77,10 +77,10 @@ public abstract class LanguageRuntime {
      * @param config           the configuration
      */
     public LanguageRuntime(String workDirectory, String projectDirectory, Environment environment, Map<String, Object> config) {
-        this.workDirectory = canonicalPath(workDirectory, false);
-        this.projectDirectory = Path.of(projectDirectory).isAbsolute() ? canonicalPath(projectDirectory, false)
-                : canonicalPath(workDirectory + File.separator + projectDirectory, false);
-        this.temporaryDirectory = canonicalPath(workDirectory + File.separator + TEMPORARY_DIRECTORY, false);
+        this.workDirectory = canonicalPath(workDirectory);
+        this.projectDirectory = Path.of(projectDirectory).isAbsolute() ? canonicalPath(projectDirectory)
+                : canonicalPath(workDirectory + File.separator + projectDirectory);
+        this.temporaryDirectory = canonicalPath(workDirectory + File.separator + TEMPORARY_DIRECTORY);
         this.environment = environment;
         this.config = config;
         this.commandOutput = Optional.ofNullable(property(KEY_COMMAND_OUTPUT, new PropertyType<List<String>>() {
@@ -233,26 +233,12 @@ public abstract class LanguageRuntime {
      * @param path file
      * @return canonical path
      */
-    protected static String canonicalPath(String path, boolean formatted) {
+    protected static String canonicalPath(String path) {
         try {
-            if (formatted) {
-                return "\"" + new File(path).getCanonicalPath() + "\"";
-            } else {
-                return new File(path).getCanonicalPath();
-            }
+            return new File(path).getCanonicalPath();
         } catch (IOException e) {
             throw new CompilationException(e.getMessage());
         }
-    }
-
-    /**
-     * Get a canonical path of a file
-     *
-     * @param path file
-     * @return canonical path
-     */
-    protected static String canonicalPath(String path) {
-        return canonicalPath(path, true);
     }
 
     /**

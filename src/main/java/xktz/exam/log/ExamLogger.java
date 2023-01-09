@@ -37,6 +37,16 @@ public interface ExamLogger extends AutoCloseable {
     public void logError(int epoch, String error);
 
     /**
+     * Log final statistic of running
+     *
+     * @param total   total
+     * @param success success
+     * @param failed  failed
+     * @param error   error
+     */
+    public void logStatistic(int total, int success, int failed, int error);
+
+    /**
      * Log the result get epoch
      *
      * @param result result

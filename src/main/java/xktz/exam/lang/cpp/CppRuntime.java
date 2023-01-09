@@ -261,12 +261,21 @@ public class CppRuntime extends LanguageRuntime {
      * Init config of c++ runtime
      * @return init config
      */
-    public static Function<String, Map<String, Object>> initConfiguration() {
-        return (name) -> Map.of(
-                "lang", "cpp",
-                "compiler", "g++",
-                "files", List.of(),
-                "out", name
-        );
+    public static Function<String, Map<String, Object>> initConfiguration(String lang) {
+        if (lang.equals("c")) {
+            return (name) -> Map.of(
+                    "lang", "c",
+                    "compiler", "gcc",
+                    "files", List.of(),
+                    "out", name
+            );
+        } else {
+            return (name) -> Map.of(
+                    "lang", "cpp",
+                    "compiler", "g++",
+                    "files", List.of(),
+                    "out", name
+            );
+        }
     }
 }

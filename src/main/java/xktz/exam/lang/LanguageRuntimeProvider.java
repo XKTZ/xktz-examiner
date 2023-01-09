@@ -5,6 +5,7 @@ import xktz.exam.environment.StandardEnvironment;
 import xktz.exam.lang.cpp.CppRuntime;
 import xktz.exam.lang.java.JavaRuntime;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,9 +63,9 @@ public class LanguageRuntimeProvider {
                         config.getOrDefault(LanguageRuntime.KEY_PROJECT_DIRECTORY, "").toString(),
                         environment,
                         config));
-        initConfig.put("c", CppRuntime.initConfiguration());
-        initConfig.put("cpp", CppRuntime.initConfiguration());
-        initConfig.put("c++", CppRuntime.initConfiguration());
+        initConfig.put("c", CppRuntime.initConfiguration("c"));
+        initConfig.put("cpp", CppRuntime.initConfiguration("cpp"));
+        initConfig.put("c++", CppRuntime.initConfiguration("cpp"));
         initConfig.put("java", JavaRuntime.initConfiguration());
     }
 

@@ -44,6 +44,10 @@ public class Main {
 
         if (command.equals("init")) {
             Map<String, Object> config = new HashMap<>();
+            properties.putIfAbsent("project", "c++");
+            properties.putIfAbsent("generator", "c++");
+            properties.putIfAbsent("examiner", "c++");
+
             config.put("epoch", 10);
             config.put("charset", "byte");
 
