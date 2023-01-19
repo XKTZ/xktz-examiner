@@ -162,6 +162,9 @@ public class Exam {
      */
     private boolean epoch(int i, ExamStatus status) {
         status.total++;
+        var pathInput = Paths.get(logDir + File.separator + i + ".in");
+        var pathOutput = Paths.get(logDir + File.separator + i + ".out");
+        var pathExpect = Paths.get(logDir + File.separator + i + ".expect");
         try {
             logger.logStart(i);
 
@@ -177,14 +180,11 @@ public class Exam {
             var examinerOutput = examiner.examine(testCase.stdout(), projectOutput.stdout());
 
             // write the possible outputs into the system
-            var pathInput = Paths.get(logDir + File.separator + i + ".in");
             writeCase(pathInput, testCase.stdout());
 
-            var pathOutput = Paths.get(logDir + File.separator + i + ".out");
             writeCase(pathOutput, projectOutput.stdout());
 
             if (examinerOutput.info().isPresent()) {
-                var pathExpect = Paths.get(logDir + File.separator + i + ".expect");
                 writeCase(pathExpect, examinerOutput.info().get());
             }
 
@@ -198,6 +198,14 @@ public class Exam {
             }
         } catch (Environment.TimeoutException e) {
             logger.logError(i, e.getMessage());
+            status.failed ++;
+            if (e.input != null) {
+                try {
+                    writeCase(pathInput, e.input);
+                } catch (IOException excp) {
+                    logger.logError(i, e.getMessage());
+                }
+            }
         } catch (ProcessExecutionFailedException e) {
             logger.logError(i, "Process <%s> failed".formatted(e.getMessage()));
         } catch (Exception e) {

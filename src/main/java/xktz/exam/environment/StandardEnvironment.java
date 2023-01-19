@@ -54,7 +54,7 @@ public class StandardEnvironment implements Environment {
             throw new EnvironmentExecutionException(e);
         }
         if (timeout) {
-            throw new TimeoutException(timeLimit);
+            throw new TimeoutException(timeLimit, input);
         }
         return result;
     }

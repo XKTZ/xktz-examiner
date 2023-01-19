@@ -88,8 +88,15 @@ public interface Environment {
     }
 
     public class TimeoutException extends RuntimeException {
+        public byte[] input;
+
         public TimeoutException(long timeLimit) {
             super("Time Limit Exceeded: %d".formatted(timeLimit));
+        }
+
+        public TimeoutException(long timeLimit, byte[] input) {
+            this(timeLimit);
+            this.input = input;
         }
     }
 
