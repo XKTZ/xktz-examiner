@@ -1,0 +1,9 @@
+{
+  "dir": "./log",
+  "type": "print",
+  "config": {
+    "to": [
+      "stdout"
+    ]
+  }
+}

@@ -3,11 +3,13 @@ package xktz.exam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import xktz.exam.examine.ExaminerProvider;
 import xktz.exam.lang.LanguageRuntimeProvider;
+import xktz.exam.log.ExamLogger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.DomainCombiner;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +27,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             // test the native image
-            System.out.printf(Configuration.getConfiguration(Main.class.getResourceAsStream("/config.json")).toString());
+            System.out.println(Configuration.getConfiguration(Main.class.getResourceAsStream("/config.json")).toString());
+            System.out.println(ExamLogger.LogConfiguration.getConfiguration(Main.class.getResourceAsStream("/logconfig.json")).toString());
             return;
         }
         var command = args[0];
@@ -79,13 +82,17 @@ public class Main {
                 exam.run(data);
             }
             case "build" -> {
-                exam.build(true, true, true);
+                var opt = properties.getProperty("c");
+                if (opt == null) opt = "111";
+                exam.build(opt.charAt(0) == '1', opt.charAt(1) == '1', opt.charAt(2) == 1);
             }
             case "exam" -> {
                 exam.examine();
             }
             case "bexam" -> {
-                exam.build(true, true, true);
+                var opt = properties.getProperty("c");
+                if (opt == null) opt = "111";
+                exam.build(opt.charAt(0) == '1', opt.charAt(1) == '1', opt.charAt(2) == 1);
                 exam.examine();
             }
             default -> {

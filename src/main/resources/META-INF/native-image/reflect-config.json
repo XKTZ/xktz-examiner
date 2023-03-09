@@ -18,6 +18,7 @@
   "name":"xktz.exam.log.ExamLogger$LogConfiguration",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true}
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
 
 ]

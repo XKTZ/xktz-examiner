@@ -1,9 +1,12 @@
 package xktz.exam.log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import xktz.exam.Main;
 import xktz.exam.examine.Examiner;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +17,7 @@ import java.util.Map;
  * @date 2022-10-24
  */
 public interface ExamLogger extends AutoCloseable {
+
 
     /**
      * Log anything
@@ -54,12 +58,21 @@ public interface ExamLogger extends AutoCloseable {
     public void logResult(int epoch, Examiner.ExamineResult result);
 
     public static class LogConfiguration {
+        private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
         public String dir = "./log";
 
         public String type = "print";
 
         public Map<String, Object> config = Map.of();
+
+        /**
+         * Get configuration
+         * @param stream stream
+         */
+        public static LogConfiguration getConfiguration(InputStream stream) throws IOException {
+            return OBJECT_MAPPER.readValue(stream, LogConfiguration.class);
+        }
 
     }
 }

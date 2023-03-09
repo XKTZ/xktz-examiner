@@ -165,31 +165,24 @@ public class Exam {
         var pathInput = Paths.get(logDir + File.separator + i + ".in");
         var pathOutput = Paths.get(logDir + File.separator + i + ".out");
         var pathExpect = Paths.get(logDir + File.separator + i + ".expect");
+
+        Environment.SystemOutput testCase = null, projectOutput = null;
+
+        Examiner.ExamineResult examinerOutput = null;
+
         try {
             logger.logStart(i);
 
             // test the code
-            var testCase = generateTestCase();
+            testCase = generateTestCase();
 
             handleSystemOutput("Test Case Generation", testCase);
 
-            var projectOutput = project.run(testCase.stdout());
+            projectOutput = project.run(testCase.stdout());
 
             handleSystemOutput("Project Running", projectOutput);
 
-            var examinerOutput = examiner.examine(testCase.stdout(), projectOutput.stdout());
-
-            // write the possible outputs into the system
-            writeCase(pathInput, testCase.stdout());
-
-            writeCase(pathOutput, projectOutput.stdout());
-
-            if (examinerOutput.info().isPresent()) {
-                writeCase(pathExpect, examinerOutput.info().get());
-            }
-
-            // logStdErrMessage the end
-            logger.logResult(i, examinerOutput);
+            examinerOutput = examiner.examine(testCase.stdout(), projectOutput.stdout());
 
             switch (examinerOutput.state()) {
                 case Examiner.SUCCESS -> status.success++;
@@ -199,17 +192,41 @@ public class Exam {
         } catch (Environment.TimeoutException e) {
             logger.logError(i, e.getMessage());
             status.failed ++;
-            if (e.input != null) {
-                try {
-                    writeCase(pathInput, e.input);
-                } catch (IOException excp) {
-                    logger.logError(i, e.getMessage());
-                }
-            }
         } catch (ProcessExecutionFailedException e) {
             logger.logError(i, "Process <%s> failed".formatted(e.getMessage()));
+            status.failed ++;
         } catch (Exception e) {
             logger.logError(i, e.getMessage());
+        }
+
+        if (testCase != null) {
+            try {
+                // write the possible outputs into the system
+                writeCase(pathInput, testCase.stdout());
+            } catch (IOException e) {
+                logger.logError(i, e.getMessage());
+            }
+        }
+
+        if (projectOutput != null) {
+            try {
+                writeCase(pathOutput, projectOutput.stdout());
+            } catch (IOException e) {
+                logger.logError(i, e.getMessage());
+            }
+        }
+
+        if (examinerOutput != null && examinerOutput.info().isPresent()) {
+            try {
+                writeCase(pathExpect, examinerOutput.info().get());
+            } catch (IOException e) {
+                logger.logError(i, e.getMessage());
+            }
+        }
+
+        if (examinerOutput != null) {
+            // logStdErrMessage the end
+            logger.logResult(i, examinerOutput);
         }
         return true;
     }
