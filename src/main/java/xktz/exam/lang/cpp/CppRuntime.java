@@ -187,6 +187,7 @@ public class CppRuntime extends LanguageRuntime {
         if (out != null) {
             commands.add("-o" + canonicalPath(out));
         }
+        commands.addAll(extraArgs);
 
         outputCommand(String.join(" ", commands));
 

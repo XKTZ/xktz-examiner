@@ -71,7 +71,9 @@ public class Main {
             return;
         }
 
-        var conf = Configuration.getConfiguration("config.json");
+        var confPath = properties.getOrDefault("config", properties.getOrDefault("conf", "config.json")).toString();
+
+        var conf = Configuration.getConfiguration(confPath);
         var exam = new Exam(System.getProperty("user.dir"), conf);
 
         switch (command) {
@@ -92,7 +94,7 @@ public class Main {
             case "bexam" -> {
                 var opt = properties.getProperty("c");
                 if (opt == null) opt = "111";
-                exam.build(opt.charAt(0) == '1', opt.charAt(1) == '1', opt.charAt(2) == 1);
+                exam.build(opt.charAt(0) == '1', opt.charAt(1) == '1', opt.charAt(2) == '1');
                 exam.examine();
             }
             default -> {
