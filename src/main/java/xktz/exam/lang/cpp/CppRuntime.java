@@ -62,6 +62,11 @@ public class CppRuntime extends LanguageRuntime {
     private static final String KEY_LLVM_TEXT_FILES = "lls";
 
     /**
+     * Key for command in running
+     */
+    private static final String KEY_RUN_BY = "runby";
+
+    /**
      * Key for extra args
      */
     private static final String KEY_EXTRA_ARGS = "args";
@@ -112,6 +117,11 @@ public class CppRuntime extends LanguageRuntime {
     private final List<String> llvmTextFiles;
 
     /**
+     * Running using a specific command
+     */
+    private final String runBy;
+
+    /**
      * Extra arguments
      */
     private final List<String> extraArgs;
@@ -138,6 +148,8 @@ public class CppRuntime extends LanguageRuntime {
         this.libDirectories = property(KEY_LIB_DIRS, new PropertyType<>() {
         });
         this.libs = property(KEY_LIBS, new PropertyType<>() {
+        });
+        this.runBy = property(KEY_RUN_BY, new PropertyType<>() {
         });
         this.llvmTextFiles = property(KEY_LLVM_TEXT_FILES, new PropertyType<>() {
         });
@@ -199,20 +211,34 @@ public class CppRuntime extends LanguageRuntime {
         }
     }
 
+    private Function<String, String[]> getParser() {
+        return (s) -> {
+            var cmd = runBy.split(" ");
+            for (int i = 0; i <cmd.length; i ++) {
+                if (cmd[i].equals("$")) {
+                    cmd[i] = s;
+                }
+            }
+            return cmd;
+        };
+    }
+
     @Override
     public Environment.SystemOutput run(byte[] input) {
+        var cmd = getParser().apply(canonicalPath(out + SystemType.executableExtension()));
         outputCommand(
-                String.join(" ", List.of(canonicalPath(out + SystemType.executableExtension())))
+                String.join(" ", cmd)
         );
-        return environment.executeCommand(timeLimit, input, canonicalPath(out + SystemType.executableExtension()));
+        return environment.executeCommand(timeLimit, input, cmd);
     }
 
     @Override
     public void runInherited(byte[] input) {
+        var cmd = getParser().apply(canonicalPath(out + SystemType.executableExtension()));
         outputCommand(
-                String.join(" ", List.of(canonicalPath(out + SystemType.executableExtension())))
+                String.join(" ", cmd)
         );
-        environment.executeInheritIOCommand(canonicalPath(out + SystemType.executableExtension()));
+        environment.executeInheritIOCommand(cmd);
     }
 
     /**
@@ -254,12 +280,14 @@ public class CppRuntime extends LanguageRuntime {
                 KEY_LIB_DIRS, List.of(),
                 KEY_LIBS, List.of(),
                 KEY_LLVM_TEXT_FILES, List.of(),
+                KEY_RUN_BY, "$",
                 KEY_EXTRA_ARGS, List.of()
         );
     }
 
     /**
      * Init config of c++ runtime
+     *
      * @return init config
      */
     public static Function<String, Map<String, Object>> initConfiguration(String lang) {

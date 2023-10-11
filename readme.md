@@ -55,7 +55,7 @@ This is the runtime setting for for c/c++.
 | libs     | list\<string\> | libraries used                                                                                                 | []       |
 | lls      | list\<string\> | this is the clang's .ll files that needs to be added into the project. (require adding "llc" into path to run) | []       |
 | args     | list\<string\> | additional arguments                                                                                           | []       |
-
+| runby    | string         | a string in the form of arguments with $, standing for the placeholder of exectuable                           | $        |
 An example C++ runtime setting:
 
 ```json
